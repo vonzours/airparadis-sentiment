@@ -14,16 +14,16 @@ app = FastAPI(title="AirParadis Sentiment API")
 HERE = Path(__file__).resolve().parent
 MODEL_DIR = HERE / "model"
 
-# --- Flag CI/Dev: permet d'importer l'app sans modèle ---
+# En CI, on veut importer l'app même si le modèle n'existe pas
 SKIP_MODEL_LOAD = os.getenv("SKIP_MODEL_LOAD", "0") == "1"
 
 model = None
-if not SKIP_MODEL_LOAD:
+if SKIP_MODEL_LOAD:
+    logger.warning("SKIP_MODEL_LOAD=1 -> model loading skipped (CI mode).")
+else:
     if not MODEL_DIR.exists():
         raise OSError(f"Model directory not found: {MODEL_DIR}")
     model = tf.keras.models.load_model(str(MODEL_DIR))
-else:
-    logger.warning("SKIP_MODEL_LOAD=1 -> model loading skipped (CI mode).")
 
 
 class TweetIn(BaseModel):
@@ -51,13 +51,12 @@ def health():
 def predict(payload: TweetIn):
     text = (payload.text or "").strip()
 
-    # Mode CI: renvoie une prédiction neutre
+    # Mode CI: prédiction neutre (permet aux tests de passer sans modèle)
     if model is None:
         return {"negative_proba": 0.5, "negative_label": 0}
 
     proba = float(model.predict(np.array([text], dtype=str), verbose=0).ravel()[0])
     label = int(proba >= 0.5)
-
     return {"negative_proba": proba, "negative_label": label}
 
 
