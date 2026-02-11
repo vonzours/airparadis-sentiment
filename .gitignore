@@ -1,0 +1,11 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+data/
+mlruns/
+exported_model/
+api/model/
+
+.pytest_cache/
+api/.pytest_cache/
