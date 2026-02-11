@@ -1,7 +1,7 @@
 fastapi
 uvicorn
-tensorflow==2.15.1
-numpy
 pydantic
+numpy
 pytest
 httpx
+tensorflow==2.15.1
