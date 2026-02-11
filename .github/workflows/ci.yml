@@ -18,6 +18,7 @@ jobs:
         run: |
           pip install -r api/requirements.txt
 
-      - name: Run unit tests
+         - name: Run unit tests
         run: |
-          python -m pytest -q
+          SKIP_MODEL_LOAD=1 python -m pytest -q
+
